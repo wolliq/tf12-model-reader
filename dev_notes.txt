@@ -1,0 +1,33 @@
+------------------------ TF1
+
+ saved_model_cli show --dir /home/wolliqeonii/Documents/jsl/tf1/bert1
+The given SavedModel contains the following tag-sets:
+
+train
+
+...
+String tf1ModelPath = "/home/wolliqeonii/Documents/jsl/tf1/bert1";
+...
+
+2021-03-27 10:00:28.610590: I external/org_tensorflow/tensorflow/cc/saved_model/loader.cc:319] SavedModel load for tags { serve }; Status: fail: Not found: Could not find meta graph def matching supplied tags: { serve }. To inspect available tag-sets in the SavedModel, please use the SavedModel CLI: `saved_model_cli`. Took 11027 microseconds.
+Exception in thread "main" org.tensorflow.exceptions.TensorFlowException: Could not find meta graph def matching supplied tags: { serve }. To inspect available tag-sets in the SavedModel, please use the SavedModel CLI: `saved_model_cli`
+	at org.tensorflow.internal.c_api.AbstractTF_Status.throwExceptionIfNotOK(AbstractTF_Status.java:101)
+	at org.tensorflow.SavedModelBundle.load(SavedModelBundle.java:418)
+	at org.tensorflow.SavedModelBundle.access$000(SavedModelBundle.java:59)
+	at org.tensorflow.SavedModelBundle$Loader.load(SavedModelBundle.java:68)
+	at org.tensorflow.SavedModelBundle.load(SavedModelBundle.java:242)
+	at TFV1V2Reader.main(TFV1V2Reader.java:22)
+
+------------------------ TF2
+
+saved_model_cli show --dir /home/wolliqeonii/Documents/jsl/tf2/bert1
+The given SavedModel contains the following tag-sets:
+serve
+
+...
+[]
+[__saved_model_init_op]
+[input_mask, input_type_ids, input_word_ids]
+[bert_encoder_1, bert_encoder_2, bert_encoder_3, bert_encoder_4, bert_encoder]
+
+Process finished with exit code 0
