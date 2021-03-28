@@ -1,11 +1,11 @@
 import org.tensorflow.*;
-import org.tensorflow.op.Op;
-import org.tensorflow.proto.framework.MetaGraphDef;
+import org.tensorflow.proto.framework.SignatureDef;
+import org.tensorflow.proto.framework.TensorInfo;
 
 import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class TFV1V2Reader {
     public static void main( String[] args ) throws IOException
@@ -15,35 +15,54 @@ public class TFV1V2Reader {
         final int NUM_PREDICTIONS = 1;
 
         // load the model Bundle
+        // String tf1ModelPath = "/home/wolliqeonii/workspace/dev/jsl/tf1-tests/saved_models/1616707109";
+        String tfModelPath = "/home/wolliqeonii/Documents/jsl/tf2/bert2";
 
-//        String tf1ModelPath = "/home/wolliqeonii/workspace/dev/jsl/tf1-tests/saved_models/1616707109";
-        String tf1ModelPath = "/home/wolliqeonii/Documents/jsl/tf2/bert1";
-
-        try (SavedModelBundle b = SavedModelBundle.load(tf1ModelPath, "serve")) {
-
-            System.out.println(b.metaGraphDef().hasGraphDef());
-
-            MetaGraphDef mgd = b.metaGraphDef();
-            List nodes = mgd.getGraphDef().getNodeList();
-            for (Object n : nodes){
-                System.out.println(nodes.toString());
+        try (SavedModelBundle bundle = SavedModelBundle.load(tfModelPath, "serve")) {
+            if(bundle.metaGraphDef().hasGraphDef() && bundle.metaGraphDef().getSignatureDefCount() > 0) {
+                for (SignatureDef sigDef : bundle.metaGraphDef().getSignatureDefMap().values()) {
+                    Map<String, TensorInfo> inputs = sigDef.getInputsMap();
+                    for (Map.Entry<String, TensorInfo> e : inputs.entrySet()){
+                        String key = e.getKey();
+                        TensorInfo tfInfo = e.getValue();
+                        System.out.println(
+                                "\nSignatureDef InputMap key :" + key +
+                                "\nSignatureDef InputMap tfInfo: " + tfInfo.getName());
+                    }
+                }
             }
 
-            Iterator<Operation> operations = b.graph().operations();
-            for (Iterator<Operation> it = operations; it.hasNext(); ) {
-                Operation o = it.next();
-                System.out.println(o.name());
-            }
 
-            List<Op> inits = b.graph().initializers();
-            for (Object i: inits){
-                System.out.println(inits.toString());
-            }
 
-            List<Signature> signatures = b.signatures();
+//            MetaGraphDef mgd = b.metaGraphDef();
+//            List nodes = mgd.getGraphDef().getNodeList();
+//            for (Object n : nodes){
+//                System.out.println(nodes.toString());
+//            }
+//
+//            Iterator<Operation> operations = b.graph().operations();
+//            for (Iterator<Operation> it = operations; it.hasNext(); ) {
+//                Operation o = it.next();
+//                System.out.println(o.name());
+//            }
+//
+//            List<Op> inits = b.graph().initializers();
+//            for (Object i: inits){
+//                System.out.println(inits.toString());
+//            }
+
+            List<Signature> signatures = bundle.signatures();
             for(Signature s : signatures){
-                System.out.println(s.inputNames());
-                System.out.println(s.outputNames());
+                System.out.println("s.inputNames(): " + s.inputNames().toString());
+                Set<String> inputNames = s.inputNames();
+                for (Object sin : inputNames){
+                    System.out.println("sin.toString(): " + sin.toString());
+                }
+
+                System.out.println("s.outputNames(): " + s.outputNames().toString());
+
+                System.out.println("s.key(): " +s.key());
+                System.out.println("s.methodName(): " +s.methodName());
             }
 
 //            // create the session from the Bundle
